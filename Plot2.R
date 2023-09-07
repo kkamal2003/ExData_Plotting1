@@ -1,23 +1,21 @@
-# first, set the corect working directory and then copy the unzipped from https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip file into this directory, then follow the below steps.
+# Load the required packages
+library(dplyr)
 
-# load dplyr package
-library(dplyr) 
+# Get data
+dat <- read.table("household_power_consumption.txt", header=TRUE, sep=";", na.strings=c("?", ""))
 
-# get data
-dat <- tbl_df(read.table("household_power_consumption.txt", header=TRUE, sep= ";", na.strings = c("?","")))
+# Create truncated dataset by subsetting specified dates
+data <- dat %>% filter(Date %in% c("1/2/2007", "2/2/2007"))
 
-# create truncated dataset by subsetting specified dates
-data <- filter(dat, Date == "1/2/2007" | Date == "2/2/2007")
-
-# remove dat from environment to free up RAM
+# Remove dat from the environment to free up RAM
 rm(dat)
 
-# convert date and time to proper formats
-data$Date <- as.Date(data$Date, format = "%d/%m/%Y")
+# Convert date and time to proper formats
+data$Date <- as.Date(data$Date, format="%d/%m/%Y")
 data$timetemp <- paste(data$Date, data$Time)
-data$Time <- strptime(data$timetemp, format = "%Y-%m-%d %H:%M:%S")
+data$Time <- as.POSIXct(data$timetemp, format="%Y-%m-%d %H:%M:%S")
 
-# create line plot across time of global active power
-png(file = "plot2.png", width = 480, height = 480)
-plot(x = data$Time, y = data$Global_active_power, type = "l", xlab = "", ylab = "Global Active Power (kilowatts)")
+# Create a line plot across time of global active power
+png(file="plot2.png", width=480, height=480)
+plot(data$Time, data$Global_active_power, type="l", xlab="", ylab="Global Active Power (kilowatts)")
 dev.off()
